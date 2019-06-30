@@ -1,0 +1,2 @@
+# CPUSchedulingSimulation
+The project will implement a rudimentary simulation of an operating system, focusing on processes, assumed to be resident in memory, waiting to use the CPU. The processes will mimic the READY, RUNNING, and BLOCKED states associated with CPU activity. The algorithms that will be implemented are: First Come First Served (FCFS), Shortest Job First (SJF), Shortest Remaining Time (SRT), and Round Robin (RR).
