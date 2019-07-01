@@ -1,5 +1,7 @@
 import sys
 import math
+import random
+from randomGenerator import srand48, drand48
 
 ''' The project will implement a rudimentary simulation of an operating system, focusing on 
     processes, assumed to be resident in memory, waiting to use the CPU. The processes will 
@@ -41,8 +43,10 @@ def main():
 	# For the RR algorithm, we define whether processes or added to the beginning or end of
 	#	the ready queue when they arrive or complete I/O.
 	# Value should be set to BEGINNING or END, with END being the default behavior.
-	queue_addition = sys.argv[8]
-
+	if len(sys.argv) > 8:
+		queue_addition = sys.argv[8]
+	else:
+		queue_addition = "END"
 
 
 
