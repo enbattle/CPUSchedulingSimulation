@@ -2,12 +2,21 @@
     Python equivalences of C(language)'s srand48() and drand48()
 '''
 
-# Initializer function for drand48()
-def srand48(seed):
-    return (seed << 16) + 0x330e
+'''	Generates a sequence of 48-bit integers, Xi, according the to linear congruential formula
 
-# Generates uniformly distributed psuedorandom numbers using a linear congruential algorithm
-#   and 48-bit integer arithmetic (similar to Random.random(), which uses the Mersenne Twister
-#   algorithm)
-def drand48(value):
-    return ((25214903917 * value + 11) & (2**48 - 1)) / 2**48
+	Xn+1 = (aXn + c) mod m, where n >= 0
+
+	a = 0x5DEECE66D
+	c = 0xB
+	m = 2^48
+'''
+
+class Rand48(object):
+    def __init__(self, seed):
+        self.n = seed
+    # Sets the high order 32-bits of Xi to the seed, and the lower 16-bits to 0x330e
+    def srand(self, seed):
+        self.n = (seed << 16) + 0x330e
+    # Stores the last 48-bit Xi and generates the Xn+1 term
+    def drand(self):
+        return (((0x5DEECE66D * self.n) + 0xB) & (2**48 - 1)) / 2**48
