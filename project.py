@@ -54,7 +54,7 @@ def main():
 
 	for i in range(0, number_simulations):
 		r = generator.drand()
-		x = -math.log(r) // lambda_value
+		x = -math.log(r) / lambda_value
 
 		print(r)
 		print(x)
