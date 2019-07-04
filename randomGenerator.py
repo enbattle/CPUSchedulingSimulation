@@ -12,11 +12,12 @@
 '''
 
 class Rand48(object):
-    def __init__(self, seed):
-        self.n = seed
-    # Sets the high order 32-bits of Xi to the seed, and the lower 16-bits to 0x330e
-    def srand(self, seed):
-        self.n = (seed << 16) + 0x330e
-    # Stores the last 48-bit Xi and generates the Xn+1 term
-    def drand(self):
-        return (((0x5DEECE66D * self.n) + 0xB) & (2**48 - 1)) / 2**48
+	def __init__(self, seed):
+		self.n = seed
+	# Sets the high order 32-bits of Xi to the seed, and the lower 16-bits to 0x330e
+	def srand48(self):
+		self.n = (self.n << 16) + 0x330e
+	# Stores the last 48-bit Xi and generates the Xn+1 term
+	def drand48(self):
+		self.n = (0x5DEECE66D * self.n + 0x0B) & (2**48 - 1)
+		return self.n / 2**48
