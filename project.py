@@ -154,6 +154,7 @@ def main():
 					# Generating I/O values
 					burst_and_io_generator(i, lambda_value, upper_bound, io_times, generator)
 
+	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
 
 	print(processes)
 	print(bursts)
