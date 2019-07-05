@@ -55,7 +55,7 @@ from fcfs import fcfs
 
 ''' Function generates the burst_time value and/or I/O time value for each burst
 '''
-def burst_and_io_generator(i, lambda_value, upper_bound, burst_or_io_list, generator):
+def burst_and_io_generator(lambda_value, upper_bound, burst_or_io_list, generator):
 
 	random_number = generator.drand48()
 	burst_time_value = math.ceil(-math.log(random_number) / lambda_value)
@@ -65,7 +65,7 @@ def burst_and_io_generator(i, lambda_value, upper_bound, burst_or_io_list, gener
 		random_number = generator.drand48()
 		burst_time_value = math.ceil(-math.log(random_number) / lambda_value)
 
-	burst_or_io_list[i].append(burst_time_value)
+	burst_or_io_list.append(burst_time_value)
 
 
 ''' Main Function
@@ -111,10 +111,10 @@ def main():
 	bursts = [0] * number_simulations
 
 	# List of lists that contains the burst times each burst in each process
-	burst_times = [[]] * number_simulations
+	burst_times = [] 
 
 	# List of lists that contains the I/O times for each burst in each process
-	io_times = [[]] * number_simulations
+	io_times = []
 
 	# Initiating the generator with srand48
 	generator = Rand48(number_generator_seed)
@@ -141,25 +141,40 @@ def main():
 
 			bursts[i] = math.floor(random_number * 100) + 1
 
+			temp_burst = []
+			temp_io = []
+
 			# For each burst of a process, generate a burst time  and an I/O time
 			for j in range(0, bursts[i]):
 				# Last burst does not have an I/O, so just generate a burst time
 				if j == bursts[i] - 1:
-					burst_and_io_generator(i, lambda_value, upper_bound, burst_times, generator)
+					burst_and_io_generator(lambda_value, upper_bound, temp_burst, generator)
 					continue
 				else:
 					# Generating burst time values
-					burst_and_io_generator(i, lambda_value, upper_bound, burst_times, generator)
+					burst_and_io_generator(lambda_value, upper_bound, temp_burst, generator)
 
 					# Generating I/O values
-					burst_and_io_generator(i, lambda_value, upper_bound, io_times, generator)
+					burst_and_io_generator(lambda_value, upper_bound, temp_io, generator)
+
+			burst_times.append(temp_burst)
+			io_times.append(temp_io)
+
+	print("PROCESSES")
+	print(processes)
+	print()
+	print("BURSTS")
+	print(bursts)
+	print()
+	print("BURST TIMES")
+	print(burst_times)
+	print()
+	print("I/O TIMES")
+	print(io_times)
+	print()
 
 	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
 
-	print(processes)
-	print(bursts)
-	print(burst_times)
-	print(io_times)
 
 
 if __name__== "__main__":
