@@ -9,48 +9,10 @@ from fcfs import fcfs
     processes, assumed to be resident in memory, waiting to use the CPU. The processes will 
     mimic the READY, RUNNING, and BLOCKED states associated with CPU activity. The algorithms 
     hat will be implemented are: 
-
     	- First Come First Served (FCFS) 
     	- Shortest Job First (SJF)
     	- Shortest Remaining Time (SRT) 
     	- Round Robin (RR).
-'''
-
-''' OUTPUT02
-	Process A [NEW] (arrival time 9 ms) 16 CPU bursts
-
-	OUTPUT03
-	Process A [NEW] (arrival time 9 ms) 16 CPU bursts
-	Process B [NEW] (arrival time 18 ms) 21 CPU bursts
-
-	OUTPUT04
-	Process A [NEW] (arrival time 9 ms) 16 CPU bursts
-	Process B [NEW] (arrival time 18 ms) 21 CPU bursts
-	Process C [NEW] (arrival time 42 ms) 4 CPU bursts
-	Process D [NEW] (arrival time 156 ms) 11 CPU bursts
-	Process E [NEW] (arrival time 134 ms) 55 CPU bursts
-	Process F [NEW] (arrival time 106 ms) 34 CPU bursts
-	Process G [NEW] (arrival time 65 ms) 80 CPU bursts
-	Process H [NEW] (arrival time 11 ms) 83 CPU bursts
-	Process I [NEW] (arrival time 68 ms) 77 CPU bursts
-	Process J [NEW] (arrival time 0 ms) 10 CPU bursts
-	Process K [NEW] (arrival time 7 ms) 13 CPU bursts
-	Process L [NEW] (arrival time 189 ms) 7 CPU bursts
-	Process M [NEW] (arrival time 16 ms) 48 CPU bursts
-	Process N [NEW] (arrival time 122 ms) 31 CPU bursts
-	Process O [NEW] (arrival time 29 ms) 31 CPU bursts
-	Process P [NEW] (arrival time 159 ms) 16 CPU bursts
-
-	OUTPUT05
-	Process A [NEW] (arrival time 102 ms) 85 CPU bursts
-	Process B [NEW] (arrival time 365 ms) 6 CPU bursts
-	Process C [NEW] (arrival time 246 ms) 95 CPU bursts
-	Process D [NEW] (arrival time 388 ms) 57 CPU bursts
-	Process E [NEW] (arrival time 1515 ms) 83 CPU bursts
-	Process F [NEW] (arrival time 1684 ms) 97 CPU bursts
-	Process G [NEW] (arrival time 669 ms) 1 CPU burst
-	Process H [NEW] (arrival time 376 ms) 49 CPU bursts
-
 '''
 
 ''' Function generates the burst_time value and/or I/O time value for each burst
@@ -105,10 +67,10 @@ def main():
 		queue_addition = "END"
 
 	# List that contains all of the stimulations
-	processes = [0] * number_simulations
+	processes = []
 
 	# List that contains the amount of bursts for each of the processes
-	bursts = [0] * number_simulations
+	bursts = []
 
 	# List of lists that contains the burst times each burst in each process
 	burst_times = [] 
@@ -120,18 +82,19 @@ def main():
 	generator = Rand48(number_generator_seed)
 	generator.srand48()
 
-	for i in range(0, number_simulations):
+	i = 0
+	while i < number_simulations:
 		# Adding the arrival times for each process
 		random_number = generator.drand48()
 		arrival_time = math.floor(-math.log(random_number) / lambda_value)
-		processes[i] = arrival_time
 
 		# Skip arrival times that exceed upper bound
 		if arrival_time > upper_bound:
-			print(upper_bound)
-			i-=1
 			continue
 		else:
+			# Store the arrival time if it does not exceed upper bound
+			processes.append(arrival_time)
+
 			# Adding the number of bursts needed for each process
 			random_number = generator.drand48()
 
@@ -139,15 +102,15 @@ def main():
 			while  math.floor(random_number * 100) + 1 > upper_bound:
 				random_number = generator.drand48()
 
-			bursts[i] = math.floor(random_number * 100) + 1
+			bursts.append(math.floor(random_number * 100) + 1)
 
 			temp_burst = []
 			temp_io = []
 
 			# For each burst of a process, generate a burst time  and an I/O time
-			for j in range(0, bursts[i]):
+			for j in range(0, bursts[len(bursts)-1]):
 				# Last burst does not have an I/O, so just generate a burst time
-				if j == bursts[i] - 1:
+				if j == bursts[len(bursts)-1] - 1:
 					burst_and_io_generator(lambda_value, upper_bound, temp_burst, generator)
 					continue
 				else:
@@ -160,18 +123,20 @@ def main():
 			burst_times.append(temp_burst)
 			io_times.append(temp_io)
 
-	print("PROCESSES")
-	print(processes)
-	print()
-	print("BURSTS")
-	print(bursts)
-	print()
-	print("BURST TIMES")
-	print(burst_times)
-	print()
-	print("I/O TIMES")
-	print(io_times)
-	print()
+		i += 1
+
+	# print("PROCESSES")
+	# print(processes)
+	# print()
+	# print("BURSTS")
+	# print(bursts)
+	# print()
+	# print("BURST TIMES")
+	# print(burst_times)
+	# print()
+	# print("I/O TIMES")
+	# print(io_times)
+	# print()
 
 	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
 
