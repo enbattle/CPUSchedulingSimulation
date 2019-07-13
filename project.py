@@ -4,6 +4,7 @@ import random
 import time
 from randomGenerator import Rand48
 from fcfs import fcfs
+from rr import rr
 
 ''' The project will implement a rudimentary simulation of an operating system, focusing on 
     processes, assumed to be resident in memory, waiting to use the CPU. The processes will 
@@ -33,30 +34,41 @@ def burst_and_io_generator(lambda_value, upper_bound, burst_or_io_list, generato
 ''' Main Function
 '''
 def main():
-	# Seed for the random number generator to determine the interarrival times of CPU bursts.
-	number_generator_seed = int(sys.argv[1])
 
-	# Lambda value that determines average value generated for interarrival times
-	# 	(with exponential distribution).
-	lambda_value = float(sys.argv[2])
+	# Error handling for the arguments
+	print(len(sys.argv))
+	if len(sys.argv) != 8 and len(sys.argv) != 9:
+		print("ERROR: Incorrect number of arguments!\r", file=sys.stderr)
+		sys.exit()
 
-	# Upper-bound for valid pseudo-random values (will skip values greater than upper bound).
-	upper_bound = int(sys.argv[3])
+	try:
+		# Seed for the random number generator to determine the interarrival times of CPU bursts.
+		number_generator_seed = int(sys.argv[1])
 
-	# Number of processes to simulate.
-	# Process IDs are assigned in alphabetical order A through Z, therefore atmost there will
-	#	be 26 processes to simulate.
-	number_simulations = int(sys.argv[4])
+		# Lambda value that determines average value generated for interarrival times
+		# 	(with exponential distribution).
+		lambda_value = float(sys.argv[2])
 
-	# Time (in milliseconds) it takes to perform a context switch.
-	context_switch_time = int(sys.argv[5])
+		# Upper-bound for valid pseudo-random values (will skip values greater than upper bound).
+		upper_bound = int(sys.argv[3])
 
-	# For SJF and SRT, we cannot know the actual CPU burst times beforehand, so we will make
-	# 	an estimate determined via exponential averaging (using "ceiling" function).
-	alpha_value = float(sys.argv[6])
+		# Number of processes to simulate.
+		# Process IDs are assigned in alphabetical order A through Z, therefore atmost there will
+		#	be 26 processes to simulate.
+		number_simulations = int(sys.argv[4])
 
-	# For the RR algoorithm, we need to define the time slice value (in milliseconds).
-	time_slice = int(sys.argv[7])
+		# Time (in milliseconds) it takes to perform a context switch.
+		context_switch_time = int(sys.argv[5])
+
+		# For SJF and SRT, we cannot know the actual CPU burst times beforehand, so we will make
+		# 	an estimate determined via exponential averaging (using "ceiling" function).
+		alpha_value = float(sys.argv[6])
+
+		# For the RR algoorithm, we need to define the time slice value (in milliseconds).
+		time_slice = int(sys.argv[7])
+	except ValueError:
+		print("ERROR: Improper arguments were given!\r", file = sys.stderr)
+		sys.exit()
 
 	# For the RR algorithm, we define whether processes or added to the beginning or end of
 	#	the ready queue when they arrive or complete I/O.
@@ -125,21 +137,21 @@ def main():
 
 		i += 1
 
-	# print("PROCESSES")
-	# print(processes)
-	# print()
-	# print("BURSTS")
-	# print(bursts)
-	# print()
-	# print("BURST TIMES")
-	# print(burst_times)
-	# print()
-	# print("I/O TIMES")
-	# print(io_times)
-	# print()
+	print("PROCESSES ARRIVALS")
+	print(processes)
+	print()
+	print("BURSTS")
+	print(bursts)
+	print()
+	print("BURST TIMES")
+	print(burst_times)
+	print()
+	print("I/O TIMES")
+	print(io_times)
+	print()
 
 	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
-
+	# rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
 
 
 if __name__== "__main__":
