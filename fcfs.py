@@ -1,6 +1,25 @@
+'''
+Group Project
+
+Steven Li
+Justin Chen
+Ishita Padhiar
+
+July 12, 2019
+Operating Systems
+Summer 2019
+
+'''
+
 import sys
 import math
+import copy
 import random
+
+'''
+Module that contains the FCFS algorithm used by the main source file
+
+'''
 
 # Printing the current status of the queue
 def print_queue(queue):
@@ -70,6 +89,7 @@ def check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_
 		for i in range(0, len(temp_io_queue)):
 			io_queue.remove(temp_io_queue[i])
 
+# Check for process arrival
 def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, temporary_wait_times):
 	# Process arrives and is added to the queue
 	queue.append(sorted_processes_by_time[processes[process_counter]])
@@ -78,11 +98,12 @@ def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processe
 	print("time {}ms: Process {} arrived; added to ready queue [Q {}]\r"
 		.format(time, sorted_processes_by_time[processes[process_counter]], print_queue(queue)))
 
+# Main function that runs the FCFS algorithm
 def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_switch_time):
-	processes = some_processes.copy()
-	bursts = some_bursts.copy()
-	burst_times = some_burst_times.copy()
-	io_times = some_io_times.copy()
+	processes = copy.deepcopy(some_processes)
+	bursts = copy.deepcopy(some_bursts)
+	burst_times = copy.deepcopy(some_burst_times)
+	io_times = copy.deepcopy(some_io_times)
 
 	process_names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", 
 						"O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
@@ -106,7 +127,6 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 	process_counter = 0
 	current_process = 0
 	current_burst = 0
-	current_io = 0
 	next_burst_completion = 0
 
 	# Queue that holds all of the current processes
@@ -141,6 +161,7 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 
 	# While there are still bursts left, keep running processes
 	while sum(bursts) != 0:
+
 		# Check for CPU burst completion (CPU is free for next process)
 		# (Also check if process has terminated with last CPU burst)
 		if time == next_burst_completion and time != 0:
@@ -152,12 +173,6 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 			# Also check for processes that may finish in between the addition of context switch time
 			temp_num = 0
 			while temp_num < context_switch_time//2:
-
-				# # Track the queue wait times for multiple processes
-				# if queue:
-				# 	for i in range(0, len(queue)):
-				# 		temporary_wait_times[sorted_processes_by_number[queue[i]]] += 1
-
 				# Check for I/O burst completion since theres a 2 second context_switch
 				if io_queue:
 					check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_wait_times)
@@ -197,11 +212,6 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 		 	# CPU is now freed
 			CPU_in_use = False
 
-		# # Track the queue wait times for multiple processes
-		# if queue:
-		# 	for i in range(0, len(queue)):
-		# 		temporary_wait_times[sorted_processes_by_number[queue[i]]] += 1
-
 		# Check for I/O burst completion
 		if io_queue:
 			# I/O burst completion function
@@ -235,12 +245,6 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 			# Also check for processes that may finish in between the addition of context switch time
 			temp_num = 0
 			while temp_num < context_switch_time//2:
-
-				# # Track the queue wait times for multiple processes
-				# if queue:
-				# 	for i in range(0, len(queue)):
-				# 		temporary_wait_times[sorted_processes_by_number[queue[i]]] += 1
-
 				# Check for I/O burst completion since theres a 2 second context_switch
 				if io_queue:
 					check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_wait_times)
@@ -296,8 +300,11 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 			time += 1;
 
 	# End of FCFS Simulator
-
 	print("time {}ms: Simulator ended for FCFS [Q {}]\r".format(time, print_queue(queue)))
+
+	# Create file (if it does not already exist) and write to it
+	statistic_file = "simout.txt"
+	open_file = open(statistic_file, "w")
 
 	# Average wait_times calculations
 	average_wait_times = 0
@@ -318,9 +325,11 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 	average_turnaround_times /= number_turnaround_times
 
 	# Printing out the FCFS algorithm statistics
-	print("Algorithm FCFS\r")
-	print("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
-	print("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
-	print("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
-	print("-- total number of context switches: {}\r".format(total_context_switches))
-	print("-- total number of preemptions: 0\r")
+	open_file.write("Algorithm FCFS\r")
+	open_file.write("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
+	open_file.write("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
+	open_file.write("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
+	open_file.write("-- total number of context switches: {}\r".format(total_context_switches))
+	open_file.write("-- total number of preemptions: 0\r")
+
+	open_file.close()

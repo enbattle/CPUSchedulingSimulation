@@ -1,9 +1,23 @@
+'''
+Group Project
+
+Steven Li
+Justin Chen
+Ishita Padhiar
+
+July 12, 2019
+Operating Systems
+Summer 2019
+
+'''
+
 import sys
 import math
 import random
 import time
 from randomGenerator import Rand48
 from fcfs import fcfs
+from sjf import sjf
 from rr import rr
 
 ''' The project will implement a rudimentary simulation of an operating system, focusing on 
@@ -36,7 +50,6 @@ def burst_and_io_generator(lambda_value, upper_bound, burst_or_io_list, generato
 def main():
 
 	# Error handling for the arguments
-	print(len(sys.argv))
 	if len(sys.argv) != 8 and len(sys.argv) != 9:
 		print("ERROR: Incorrect number of arguments!\r", file=sys.stderr)
 		sys.exit()
@@ -137,21 +150,24 @@ def main():
 
 		i += 1
 
-	print("PROCESSES ARRIVALS")
-	print(processes)
-	print()
-	print("BURSTS")
-	print(bursts)
-	print()
-	print("BURST TIMES")
-	print(burst_times)
-	print()
-	print("I/O TIMES")
-	print(io_times)
-	print()
+	# print("PROCESSES ARRIVALS")
+	# print(processes)
+	# print()
+	# print("BURSTS")
+	# print(bursts)
+	# print()
+	# print("BURST TIMES")
+	# print(burst_times)
+	# print()
+	# print("I/O TIMES")
+	# print(io_times)
+	# print()
 
 	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
-	# rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
+	print()
+	sjf(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
+	print()
+	rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
 
 
 if __name__== "__main__":

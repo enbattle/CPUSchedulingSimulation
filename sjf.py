@@ -1,5 +1,25 @@
+'''
+Group Project
+
+Steven Li
+Justin Chen
+Ishita Padhiar
+
+July 12, 2019
+Operating Systems
+Summer 2019
+
+'''
+
 import sys
 import math
+import copy
+import random
+
+'''
+Module that contains the SJF algorithm used by the main source file
+
+'''
 
 # Printing the current status of the queue
 def print_queue(queue):
@@ -109,22 +129,23 @@ def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processe
 	print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]\r"
 		.format(time, sorted_processes_by_time[processes[process_counter]], incoming_burst, print_queue(queue)))
 
+# Main function that runs the SJF Algorithm
 def sjf(some_processes, some_bursts, some_burst_times, some_io_times, context_switch_time, lambda_value, alpha_value):
-	processes = some_processes.copy()
-	bursts = some_bursts.copy()
-	burst_times = some_burst_times.copy()
-	io_times = some_io_times.copy()
+	processes = copy.deepcopy(some_processes)
+	bursts = copy.deepcopy(some_bursts)
+	burst_times = copy.deepcopy(some_burst_times)
+	io_times = copy.deepcopy(some_io_times)
 
 	process_names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
 						"O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
-	# Variables used to calculate FCFS statistics
+	# Variables used to calculate SJF statistics
 	total_burst_time = 0
 	total_wait_times = dict()
 	total_turnaround_times = dict()
 	total_context_switches = 0
 
-	# FCFS statistics calculations
+	# SJF statistics calculations
 	total_bursts_completed = sum(bursts)
 	temporary_wait_times = [0] * len(processes)
 	temporary_turnaround_times = [0] * len(processes)
@@ -315,6 +336,10 @@ def sjf(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	# End of SJF Simulator
 	print("time {}ms: Simulator ended for SJF [Q {}]\r".format(time, print_queue(queue)))
 
+	# Create file (if it does not already exist) and write to it
+	statistic_file = "simout.txt"
+	open_file = open(statistic_file, "a")
+
 	# Average wait_times calculations
 	average_wait_times = 0
 	number_wait_times = 0
@@ -333,10 +358,12 @@ def sjf(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 		number_turnaround_times += len(total_turnaround_times[process])
 	average_turnaround_times /= number_turnaround_times
 
-	# Printing out the FCFS algorithm statistics
-	print("Algorithm SJF\r")
-	print("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
-	print("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
-	print("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
-	print("-- total number of context switches: {}\r".format(total_context_switches))
-	print("-- total number of preemptions: 0\r")
+	# Printing out the SJF algorithm statistics
+	open_file.write("Algorithm SJF\r")
+	open_file.write("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
+	open_file.write("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
+	open_file.write("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
+	open_file.write("-- total number of context switches: {}\r".format(total_context_switches))
+	open_file.write("-- total number of preemptions: 0\r")
+
+	open_file.close()
