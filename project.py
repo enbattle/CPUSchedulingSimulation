@@ -19,6 +19,7 @@ from randomGenerator import Rand48
 from fcfs import fcfs
 from sjf import sjf
 from rr import rr
+from srt import srt
 
 ''' The project will implement a rudimentary simulation of an operating system, focusing on 
     processes, assumed to be resident in memory, waiting to use the CPU. The processes will 
@@ -163,11 +164,13 @@ def main():
 	# print(io_times)
 	# print()
 
-	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
-	print()
+	#fcfs(processes, bursts, burst_times, io_times, context_switch_time)
+	#print()
 	sjf(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
 	print()
-	rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
+	srt(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
+	print()
+	#rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
 
 
 if __name__== "__main__":
