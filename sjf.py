@@ -98,7 +98,6 @@ def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, 
 			if (inserted == False):
 				queue.append(incoming_process)
 
-			#queue.append(io_queue[i][1])
 			if time <= 999:
 				print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
 					.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
