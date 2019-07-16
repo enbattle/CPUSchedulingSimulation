@@ -258,7 +258,7 @@ def fcfs(some_processes, some_bursts, some_burst_times, some_io_times, context_s
 					if time == processes[process_counter]:
 
 						# Process arrival function				
-						check_process_arrival(time, queue, sorted_processes_by_time, processes, process_counter, temporary_wait_times)
+						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, temporary_wait_times)
 
 						process_counter += 1 
 

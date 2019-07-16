@@ -44,29 +44,30 @@ def check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bu
 	# Print process termination if burst counter is 0
 	# Otherwise, print amount of bursts left and next I/O completion
 	if bursts[sorted_processes_by_number[current_process]] == 0:
-		print("time {}ms: Process {} terminated [Q {}]\r"
+		print("time {}ms: Process {} terminated [Q {}]"
 				.format(time, current_process, print_queue(queue)))
 	else:
-		if bursts[sorted_processes_by_number[current_process]] == 1:
-			print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]\r"
+		if bursts[sorted_processes_by_number[current_process]] == 1 and time <= 999:
+			print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]"
 				.format(time, current_process, tau_dict[current_process], bursts[sorted_processes_by_number[current_process]],
 				print_queue(queue)))
-		else:
-			print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]\r"
+		elif time <= 999:
+			print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]"
 				.format(time, current_process, tau_dict[current_process], bursts[sorted_processes_by_number[current_process]],
 				print_queue(queue)))
 
 		# recalculate tau
 		actual_burst = b_t_copy[sorted_processes_by_number[current_process]].pop(0)
 		tau_dict[current_process] = math.ceil((tau_dict[current_process] * alpha_value) + (actual_burst * alpha_value))
-		print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]\r"
-			.format(time, tau_dict[current_process], current_process, print_queue(queue)))
+		if time <= 999:
+			print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]"
+				.format(time, tau_dict[current_process], current_process, print_queue(queue)))
 
 		current_io = io_times[sorted_processes_by_number[current_process]].pop(0)
 		current_io += time + context_switch_time//2
-
-		print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]\r"
-			.format(time, current_process, current_io, print_queue(queue)))
+		if time <= 999:
+			print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]"
+				.format(time, current_process, current_io, print_queue(queue)))
 
 		# Add I/O completion to the I/O queue, and sort it
 		io_queue.append((current_io, current_process))
@@ -76,9 +77,10 @@ def check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bu
 
 
 # Check for I/O burst completion
-def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy):
+def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, preempted_process):
 	temp_io_queue = []
 	pre = False
+	preempt_counter = 0
 	for i in range(0, len(io_queue)):
 		if io_queue[i][0] == time:
 			temp_io_queue.append(io_queue[i])
@@ -88,7 +90,7 @@ def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, 
 			inserted = False
 			for j in range(0, len(queue)):
 				temp_burst = t_d_copy[queue[j]]
-				if (incoming_burst < temp_burst) or (incoming_burst == temp_burst and incoming_process < queue[j]):
+				if (incoming_burst < temp_burst) or (incoming_burst == temp_burst and incoming_process < queue[j] and queue[j] != current_process):
 					queue.insert(j, incoming_process)
 					inserted = True
 					break
@@ -97,22 +99,47 @@ def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, 
 				queue.append(incoming_process)
 
 			#queue.append(io_queue[i][1])
-			if not last_check:
+			if preempted_process == 0 and time <= 999:
+				c_burst = t_d_copy[current_process]
+				inserted = False
+				for j in range(0, len(queue)):
+					temp_burst = t_d_copy[queue[j]]
+					if (c_burst < temp_burst) or (c_burst == temp_burst and current_process < queue[j]):
+						queue.insert(j, current_process)
+						inserted = True
+						break
+				if inserted == False:
+					queue.append(current_process)
+				print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+					.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
+				ind = queue.index(current_process)
+				queue.pop(ind)
+
+			elif preempted_process == 1 and time <= 999:
+				print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+					.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
+
+			elif not last_check:
 				if(CPU_in_use == True and incoming_process == queue[0]):
 					temp = queue[1]
 					queue.pop(1)
-					print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]\r"
-						.format(time, incoming_process, tau_dict[incoming_process], temp, print_queue(queue)))
+					if time <= 999:
+						print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]"
+							.format(time, incoming_process, tau_dict[incoming_process], temp, print_queue(queue)))
 					queue.insert(1,temp)
-				elif len(queue) == 1:
-					print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]\r"
-						.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
-				else:
+					preempt_counter +=1
+
+				elif CPU_in_use == True:
 					temp = queue[0]
 					queue.pop(0)
-					print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]\r"
-						.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
+					if time <= 999:
+						print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+							.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
 					queue.insert(0, temp)
+				elif time <= 999:
+					print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+						.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
+								
 			else:
 				#print("HERE")
 				c_burst = t_d_copy[current_process]
@@ -125,15 +152,22 @@ def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, 
 						break
 				if inserted == False:
 					queue.append(current_process)
+
 				if queue[0] == incoming_process:
 					temp = queue[1]
 					queue.pop(1)
-					print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]\r"
-						.format(time, incoming_process, tau_dict[incoming_process], temp, print_queue(queue)))
-					#queue.insert(1,temp)
-					#print(time)
+					if time <= 999:
+						print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]"
+							.format(time, incoming_process, tau_dict[incoming_process], temp, print_queue(queue)))
 					pre = True
-					#print(time)
+					preempt_counter += 1
+				else:
+					temp = queue[0]
+					queue.pop(0)
+					if time <= 999:
+						print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]"
+							.format(time, incoming_process, tau_dict[incoming_process], print_queue(queue)))
+
 
 			temporary_wait_times[sorted_processes_by_number[io_queue[i][1]]] = time
 
@@ -144,9 +178,9 @@ def check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, 
 	if temp_io_queue:
 		for i in range(0, len(temp_io_queue)):
 			io_queue.remove(temp_io_queue[i])
-	return pre
+	return pre, preempt_counter
 
-def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy):
+def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use):
 	# Process arrives and is added to the queue
 	incoming_process = sorted_processes_by_time[processes[process_counter]]
 	incoming_burst = t_d_copy[incoming_process]
@@ -163,16 +197,18 @@ def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processe
 
 	temporary_wait_times[sorted_processes_by_number[sorted_processes_by_time[processes[process_counter]]]] = time
 
-	if(len(queue) != 1):
+	if(CPU_in_use == True):
 		temp = queue[0]
 		queue.pop(0)
-		print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]\r"
-			.format(time, sorted_processes_by_time[processes[process_counter]], incoming_burst, print_queue(queue)))
+		if time <= 999:
+			print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]"
+				.format(time, sorted_processes_by_time[processes[process_counter]], incoming_burst, print_queue(queue)))
 		queue.insert(0,temp)
 
 	else:
-		print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]\r"
-			.format(time, sorted_processes_by_time[processes[process_counter]], incoming_burst, print_queue(queue)))
+		if time <= 999:
+			print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]"
+				.format(time, sorted_processes_by_time[processes[process_counter]], incoming_burst, print_queue(queue)))
 
 # Main function that runs the SJF Algorithm
 def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_switch_time, lambda_value, alpha_value):
@@ -229,10 +265,10 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	for i in range(0, len(processes)):
 		tau_dict[process_names[i]] = int(1 / lambda_value)
 		if bursts[i] == 1:
-			print("Process {} [NEW] (arrival time {} ms) {} CPU burst (tau {}ms)\r".format(process_names[i],
+			print("Process {} [NEW] (arrival time {} ms) {} CPU burst (tau {}ms)".format(process_names[i],
 			processes[i], bursts[i], tau_dict[process_names[i]]))
 		else:
-			print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {}ms)\r".format(process_names[i],
+			print("Process {} [NEW] (arrival time {} ms) {} CPU bursts (tau {}ms)".format(process_names[i],
 			processes[i], bursts[i], tau_dict[process_names[i]]))
 		sorted_processes_by_time[processes[i]] = process_names[i]
 		sorted_processes_by_number[process_names[i]] = i
@@ -243,8 +279,8 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	processes = list(sorted(sorted_processes_by_time.keys()))
 
 	# Print out that the simulator stated for SRT
-	print("time {}ms: Simulator started for SRT [Q {}]\r".format(time, print_queue(queue)))
-
+	print("time {}ms: Simulator started for SRT [Q {}]".format(time, print_queue(queue)))
+	pre_type = False
 	# While there are still bursts left, keep running processes
 	while sum(bursts) != 0:
 
@@ -252,6 +288,8 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 		# (Also check if process has terminated with last CPU burst)
 		last_check = False
 		old_process = None
+		pre = False
+		
 
 		if time == next_burst_completion and time != 0:
 
@@ -259,19 +297,23 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 			check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bursts, io_queue, io_times, context_switch_time, tau_dict, burst_times, alpha_value, reprocessing_queue, b_t_copy2)
 			t_d_copy[current_process] = tau_dict[current_process]
 
+			# CPU is now freed
+			CPU_in_use = False
+
 			# Add first half of context switch time to remove the process
 			# Also check for processes that may finish in between the addition of context switch time
 			temp_num = 0
 			while temp_num < context_switch_time//2:
 				# Check for I/O burst completion since theres a 2 second context_switch
 				if io_queue:
-					check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy)
+					_, pre_count = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, -1)
+					total_preemptions += pre_count
 				# Check for process arrivals since there is a 2 second context_switch
 				if process_counter != len(processes):
 					if time == processes[process_counter]:
 
 						# Process arrival function
-						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy)
+						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use)
 
 						process_counter += 1
 
@@ -298,12 +340,8 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 				initial_switch = False
 				after_switch = False
 
-			# CPU is now freed
-			CPU_in_use = False
 			b_t_copy[sorted_processes_by_number[current_process]].pop(0)
 			burst_times[sorted_processes_by_number[current_process]].pop(0)
-
-
 		
 
 		elif time != 0 and CPU_in_use == True:
@@ -323,31 +361,20 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 					break
 			if (inserted == False):
 				queue.append(current_process)
-			
-			#queue.insert(0, current_process)
-
 
 			temporary_wait_times[sorted_processes_by_number[old_process]] = time
 
-			#CPU_in_use = False
-
-
 		# Check for I/O burst completion
 		if io_queue:
-			#print("here56")
-			check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy)
-
+			pre, pre_count = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, -1)
+			total_preemptions += pre_count
 		# Check for process arrivals
 		if process_counter != len(processes):
 			if time == processes[process_counter]:
-				check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy)
+				check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use)
 				process_counter += 1
 
-		# IF CPU is not in use, start running a process
-		#print(queue)
 		if CPU_in_use == False and len(queue) != 0:
-			#print("HERE3")
-			# Run first process in the queue (First Come, First Serve)
 			current_process = queue.pop(0)
 
 			# Add queue wait times to appropriate list
@@ -367,14 +394,14 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 			while temp_num < context_switch_time//2:
 				# Check for I/O burst completion since theres a 2 second context_switch
 				if io_queue:
-					check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy)
-
+					_,pre_count = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, -1)
+					total_preemptions += pre_count
 				# Check for process arrivals since there is a 2 second context_switch
 				if process_counter != len(processes):
 					if time == processes[process_counter]:
 
 						# Process arrival function
-						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy)
+						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use)
 
 						process_counter += 1 
 
@@ -396,30 +423,26 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 
 			# If process is first time processing, print it for using all bursts
 			# If process is some other time processing, print it for using remaining bursts
-			#print("hereeeeeeeeee")
-			if reprocessing_queue[sorted_processes_by_number[current_process]] == False:
-				print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]\r"
+			if time <= 999:
+				print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]"
 					.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
-			else:
-				print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]\r"
-					.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
-			#print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]\r"
-			#	.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
-
+			
 			if len(queue) != queue_len:
 				temp_process = queue[0]
-				if b_t_copy[sorted_processes_by_number[current_process]][0] > b_t_copy[sorted_processes_by_number[temp_process]][0]:
-					print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]\r".format(time, queue[0], tau_dict[queue[0]], current_process, print_queue(queue)))
+				if t_d_copy[current_process] > t_d_copy[temp_process]:
+					if time <= 999:
+						print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]".format(time, queue[0], tau_dict[queue[0]], current_process, print_queue(queue)))
 					time -= 1;
 					burst_times[sorted_processes_by_number[current_process]][0] += 1
+					total_preemptions += 1
 					#print(b_t_copy[sorted_processes_by_number[current_process]][0])
 			# CPU now in use
 			CPU_in_use = True
 			last_check = True
 
 		elif len(queue) != 0 :
+
 			current_process = queue.pop(0)
-			#print(b_t_copy[sorted_processes_by_number[old_process]][0])
 
 			# Add queue wait times to appropriate list
 			if current_process in total_wait_times:
@@ -435,73 +458,92 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 			# Also check for processes that may finish in between the addition of context switch time
 			
 			if old_process != current_process:
-				#print(b_t_copy[sorted_processes_by_number[old_process]][0])
 				b_t_copy[sorted_processes_by_number[old_process]][0] = burst_times[sorted_processes_by_number[old_process]][0]
-				#t_d_copy[old_process] += 1
-				#print(b_t_copy[sorted_processes_by_number[old_process]][0])
 
 				temp_num = 0
-				while temp_num < context_switch_time:
+				queue_len = len(queue)
+				while temp_num < context_switch_time//2 :
+					time += 1
 					# Check for I/O burst completion since theres a 2 second context_switch
 					if io_queue:
-						check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy)
-
+						pre, pre_count = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, 0)
+						total_preemptions += pre_count
 					# Check for process arrivals since there is a 2 second context_switch
 					if process_counter != len(processes):
 						if time == processes[process_counter]:
-
-							# Process arrival function
-							check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy)
-
+							check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use)
 							process_counter += 1 
 
-					time += 1
+	
 					temp_num += 1
 					temporary_turnaround_times[sorted_processes_by_number[current_process]] += 1
 
 				initial_switch = True
 
+				if len(queue) != queue_len:
+					temp_process = queue[0]
+					if t_d_copy[current_process] > t_d_copy[temp_process]:
+						time -= 2;
+						burst_times[sorted_processes_by_number[current_process]][0] += 1
+						pre_type = True
+						continue
+				
+				pre_type = False
+
+				queue_len = len(queue)
+				if not pre_type:
+					temp_num = 0
+					while temp_num < context_switch_time//2:
+						# Check for I/O burst completion since theres a 2 second context_switch
+						time += 1
+						if io_queue:
+							_,pre_count =  check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, 1)
+							total_preemptions += pre_count
+						# Check for process arrivals since there is a 2 second context_switch
+						if process_counter != len(processes):
+							if time == processes[process_counter]:
+								check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, t_d_copy, CPU_in_use)
+								process_counter += 1 
+
+						
+						temp_num += 1
+						temporary_turnaround_times[sorted_processes_by_number[current_process]] += 1
+
+					initial_switch = True
+
 				# Pop the next burst time for the process and check for next burst completion time
 				current_burst = b_t_copy[sorted_processes_by_number[current_process]][0]
 				next_burst_completion = time + current_burst
 
-			if old_process != current_process:
 				reprocessing_queue[sorted_processes_by_number[old_process]] = True
 
-				# Add current burst time to total burst time (to calculate statistic)
-				# Increment number of bursts completed
-				#if reprocessing_queue[sorted_processes_by_number[current_process]] == False:
-				#	total_burst_time += current_burst
+				if time <= 999:
+					print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]"
+						.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
+
+				if len(queue) != queue_len:
+					temp_process = queue[0]
+					if t_d_copy[current_process] > t_d_copy[temp_process]:
+						if time <= 999:
+							print("time {}ms: Process {} (tau {}ms) will preempt {} [Q {}]".format(time, queue[0], tau_dict[queue[0]], current_process, print_queue(queue)))
+						time -= 1;
+						burst_times[sorted_processes_by_number[current_process]][0] += 1
+						total_preemptions += 1
 				
-				# If process is first time processing, print it for using all bursts
-				# If process is some other time processing, print it for using remaining bursts
-				if reprocessing_queue[sorted_processes_by_number[current_process]] == False:
-					#print("HERE!!!!!!!!!!")
-					print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]\r"
-						.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
-					#print("HERE!!!!!!!!!!")
-				else:
-					#print("HOLA!!!!!!!!!!")
-					print("time {}ms: Process {} (tau {}ms) started using the CPU with {}ms burst remaining [Q {}]\r"
-						.format(time, current_process, tau_dict[current_process], current_burst, print_queue(queue)))
-					#print("HOLA!!!!!!!!!!!")
-			#else:
-
-
+				
 
 		# Check for I/O burst completion
 		if io_queue:
-			#print("here56" , last_check)
-			#print(time)
-			pre = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy)
+			pre, pre_count = check_IO_burst(time, queue, io_queue, tau_dict, sorted_processes_by_number, temporary_wait_times, CPU_in_use, last_check, current_process, t_d_copy, -1)
+			total_preemptions += pre_count
 			if (pre == True):
 				time -= 1
 				burst_times[sorted_processes_by_number[current_process]][0] += 1
-			#print(time)
+
 		# Check for process arrivals
 		if process_counter != len(processes):
 			if time == processes[process_counter]:
-				check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, last_check, t_d_copy)
+				check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, tau_dict, temporary_wait_times, last_check, t_d_copy, CPU_in_use)
 				process_counter += 1
 
 		# Track the turnaround times for multiple processes
@@ -513,7 +555,7 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 			time += 1;
 
 	# End of SRT Simulator
-	print("time {}ms: Simulator ended for SRT [Q {}]\r".format(time, print_queue(queue)))
+	print("time {}ms: Simulator ended for SRT [Q {}]".format(time, print_queue(queue)))
 
 	# Create file (if it does not already exist) and write to it
 	statistic_file = "simout.txt"
@@ -538,11 +580,11 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	average_turnaround_times /= number_turnaround_times
 
 	# Printing out the SRT algorithm statistics
-	open_file.write("Algorithm SRT\r")
-	open_file.write("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
-	open_file.write("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
-	open_file.write("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
-	open_file.write("-- total number of context switches: {}\r".format(total_context_switches + total_preemptions))
-	open_file.write("-- total number of preemptions: {}\r".format(total_preemptions))
+	open_file.write("Algorithm SRT\n")
+	open_file.write("-- average CPU burst time: {0:.3f} ms\n".format(total_burst_time/total_bursts_completed))
+	open_file.write("-- average wait time: {0:.3f} ms\n".format(average_wait_times))
+	open_file.write("-- average turnaround time: {0:.3f} ms\n".format(average_turnaround_times))
+	open_file.write("-- total number of context switches: {}\n".format(total_context_switches + total_preemptions))
+	open_file.write("-- total number of preemptions: {}\n".format(total_preemptions))
 
 	open_file.close()

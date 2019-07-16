@@ -52,8 +52,7 @@ def main():
 
 	# Error handling for the arguments
 	if len(sys.argv) != 8 and len(sys.argv) != 9:
-		print("ERROR: Incorrect number of arguments!\r", file=sys.stderr)
-		sys.exit()
+		sys.exit("ERROR: Incorrect number of arguments!")
 
 	try:
 		# Seed for the random number generator to determine the interarrival times of CPU bursts.
@@ -81,16 +80,20 @@ def main():
 		# For the RR algoorithm, we need to define the time slice value (in milliseconds).
 		time_slice = int(sys.argv[7])
 	except ValueError:
-		print("ERROR: Improper arguments were given!\r", file = sys.stderr)
-		sys.exit()
+		sys.exit("ERROR: Improper arguments were given!")
 
 	# For the RR algorithm, we define whether processes or added to the beginning or end of
 	#	the ready queue when they arrive or complete I/O.
 	# Value should be set to BEGINNING or END, with END being the default behavior.
 	if len(sys.argv) > 8:
-		queue_addition = sys.argv[8]
+		if sys.argv[8] == "BEGINNING" or sys.argv[8] == "END":
+			queue_addition = sys.argv[8]
+		else:
+			sys.exit("ERROR: Enter correct rr_add!")
 	else:
 		queue_addition = "END"
+
+	print(queue_addition)
 
 	# List that contains all of the stimulations
 	processes = []
@@ -151,25 +154,19 @@ def main():
 
 		i += 1
 
-	# print("PROCESSES ARRIVALS")
-	# print(processes)
-	# print()
-	# print("BURSTS")
-	# print(bursts)
-	# print()
-	# print("BURST TIMES")
-	# print(burst_times)
-	# print()
-	# print("I/O TIMES")
-	# print(io_times)
-	# print()
-
+	# FCFS Algorithm
 	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
 	print()
+
+	# SJF Algorithm
 	sjf(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
 	print()
+
+	# SRT Algorithm 
 	srt(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
 	print()
+
+	# RR Algorithm
 	rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
 
 
