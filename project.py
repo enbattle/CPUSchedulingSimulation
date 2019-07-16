@@ -151,7 +151,11 @@ def main():
 
 		i += 1
 
+<<<<<<< HEAD
 	# print("PROCESSES ARRIVALS")
+=======
+	# print("PROCESSES")
+>>>>>>> origin
 	# print(processes)
 	# print()
 	# print("BURSTS")
@@ -164,6 +168,7 @@ def main():
 	# print(io_times)
 	# print()
 
+<<<<<<< HEAD
 	#fcfs(processes, bursts, burst_times, io_times, context_switch_time)
 	#print()
 	sjf(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
@@ -171,6 +176,10 @@ def main():
 	srt(processes, bursts, burst_times, io_times, context_switch_time, lambda_value, alpha_value)
 	print()
 	#rr(processes, bursts, burst_times, io_times, context_switch_time, time_slice, queue_addition)
+=======
+	fcfs(processes, bursts, burst_times, io_times, context_switch_time)
+
+>>>>>>> origin
 
 
 if __name__== "__main__":

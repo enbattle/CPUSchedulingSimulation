@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 #Testing files
 fcfsoutput.txt
 output.txt
+=======
+# Output test file
+output.txt
+fcfsoutput.txt
+>>>>>>> origin
