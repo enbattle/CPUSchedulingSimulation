@@ -205,7 +205,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 				while temp_num < context_switch_time//2:
 					# Check for I/O burst completion since theres a 2 second context_switch
 					if io_queue:
-						check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_wait_times,  queue_addition)
+						check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_wait_times, queue_addition)
 
 					# Check for process arrivals since there is a 2 second context_switch
 					if process_counter != len(processes):
@@ -350,7 +350,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 					if time == processes[process_counter]:
 
 						# Process arrival function				
-						check_process_arrival(time, queue, sorted_processes_by_time, processes, process_counter, temporary_wait_times, queue_addition)
+						check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, temporary_wait_times, queue_addition)
 
 						process_counter += 1 
 
@@ -389,7 +389,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 				if time == processes[process_counter]:
 
 					# Process arrival function				
-					check_process_arrival(time, queue, sorted_processes_by_time, processes, process_counter, temporary_wait_times, queue_addition)
+					check_process_arrival(time, queue, sorted_processes_by_time, sorted_processes_by_number, processes, process_counter, temporary_wait_times, queue_addition)
 
 					process_counter += 1
 
