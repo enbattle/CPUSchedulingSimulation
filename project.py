@@ -93,8 +93,6 @@ def main():
 	else:
 		queue_addition = "END"
 
-	print(queue_addition)
-
 	# List that contains all of the stimulations
 	processes = []
 
