@@ -44,17 +44,17 @@ def check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bu
 	# Print process termination if burst counter is 0
 	# Otherwise, print amount of bursts left and next I/O completion
 	if bursts[sorted_processes_by_number[current_process]] == 0:
-		print("time {}ms: Process {} terminated [Q {}]\r"
+		print("time {}ms: Process {} terminated [Q {}]"
 				.format(time, current_process, print_queue(queue)))
 	else:
 
 		if time <= 999:
 			if bursts[sorted_processes_by_number[current_process]] == 1:
-				print("time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]\r"
+				print("time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]"
 					.format(time, current_process, bursts[sorted_processes_by_number[current_process]], 
 					print_queue(queue)))
 			else:
-				print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]\r"
+				print("time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]"
 					.format(time, current_process, bursts[sorted_processes_by_number[current_process]], 
 					print_queue(queue)))
 
@@ -62,7 +62,7 @@ def check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bu
 		current_io += time + context_switch_time//2
 
 		if time <= 999:
-			print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]\r"
+			print("time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]"
 				.format(time, current_process, current_io, print_queue(queue)))
 
  		# Add I/O completion to the I/O queue, and sort it
@@ -86,7 +86,7 @@ def check_IO_burst(time, queue, io_queue, sorted_processes_by_number, temporary_
 				queue.insert(0, io_queue[i][1])
 
 			if time <= 999:
-				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]\r"
+				print("time {}ms: Process {} completed I/O; added to ready queue [Q {}]"
 					.format(time, io_queue[i][1], print_queue(queue)))
 
 			temporary_wait_times[sorted_processes_by_number[io_queue[i][1]]] = time
@@ -110,7 +110,7 @@ def check_process_arrival(time, queue, sorted_processes_by_time, sorted_processe
 	temporary_wait_times[sorted_processes_by_number[sorted_processes_by_time[processes[process_counter]]]] = time
 
 	if time <= 999:
-		print("time {}ms: Process {} arrived; added to ready queue [Q {}]\r"
+		print("time {}ms: Process {} arrived; added to ready queue [Q {}]"
 			.format(time, sorted_processes_by_time[processes[process_counter]], print_queue(queue)))
 
 # Main function that runs the RR algorithm
@@ -163,10 +163,10 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 	# Print out all of the initial processes, their arrival times, and CPU bursts
 	for i in range(0, len(processes)):
 		if bursts[i] == 1:
-			print("Process {} [NEW] (arrival time {} ms) {} CPU burst\r".format(process_names[i], 
+			print("Process {} [NEW] (arrival time {} ms) {} CPU burst".format(process_names[i], 
 			processes[i], bursts[i]))
 		else:
-			print("Process {} [NEW] (arrival time {} ms) {} CPU bursts\r".format(process_names[i], 
+			print("Process {} [NEW] (arrival time {} ms) {} CPU bursts".format(process_names[i], 
 			processes[i], bursts[i]))
 		sorted_processes_by_time[processes[i]] = process_names[i]
 		sorted_processes_by_number[process_names[i]] = i
@@ -175,7 +175,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 	processes = list(sorted(sorted_processes_by_time.keys()))
 
 	# Print out that the simulator stated for RR
-	print("time {}ms: Simulator started for RR [Q {}]\r".format(time, print_queue(queue)))
+	print("time {}ms: Simulator started for RR [Q {}]".format(time, print_queue(queue)))
 
 	# While there are still bursts left, keep running processes
 	while sum(bursts) != 0:
@@ -193,7 +193,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 			# Check if queue is empty or not
 			if queue:
 				if time <= 999:
-					print("time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]\r"
+					print("time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]"
 						.format(time, current_process, burst_times[sorted_processes_by_number[current_process]][0], print_queue(queue)))
 
 				# Increment the preemption
@@ -245,7 +245,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 			# If the queue is empty, keep running current process by increments of time slice
 			else:
 				if time <= 999:
-					print("time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]\r"
+					print("time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]"
 						.format(time, print_queue(queue)))
 
 				# Set new burst time and next time slice time
@@ -374,10 +374,10 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 				# If process is first time processing, print it for using all bursts
 				# If process is some other time processing, print it for using remaining bursts
 				if reprocessing_queue[sorted_processes_by_number[current_process]] == False:
-					print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]\r"
+					print("time {}ms: Process {} started using the CPU for {}ms burst [Q {}]"
 						.format(time, current_process, current_burst, print_queue(queue)))
 				else:
-					print("time {}ms: Process {} started using the CPU with {}ms burst remaining [Q {}]\r"
+					print("time {}ms: Process {} started using the CPU with {}ms burst remaining [Q {}]"
 						.format(time, current_process, current_burst, print_queue(queue)))
 
 			# Check for I/O burst completion since theres a 2 second context_switch
@@ -405,7 +405,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 			time += 1;
 
 	# End of RR Simulator
-	print("time {}ms: Simulator ended for RR [Q {}]\r".format(time, print_queue(queue)))
+	print("time {}ms: Simulator ended for RR [Q {}]".format(time, print_queue(queue)))
 
 	# Create file (if it does not already exist) and write to it
 	statistic_file = "simout.txt"
@@ -430,11 +430,11 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 	average_turnaround_times /= (number_turnaround_times - total_preemptions)
 
 	# Printing out the RR algorithm statistics
-	open_file.write("Algorithm RR\r")
-	open_file.write("-- average CPU burst time: {0:.3f} ms\r".format(total_burst_time/total_bursts_completed))
-	open_file.write("-- average wait time: {0:.3f} ms\r".format(average_wait_times))
-	open_file.write("-- average turnaround time: {0:.3f} ms\r".format(average_turnaround_times))
-	open_file.write("-- total number of context switches: {}\r".format(total_context_switches + total_preemptions))
-	open_file.write("-- total number of preemptions: {}\r".format(total_preemptions))
+	open_file.write("Algorithm RR\n")
+	open_file.write("-- average CPU burst time: {0:.3f} ms\n".format(total_burst_time/total_bursts_completed))
+	open_file.write("-- average wait time: {0:.3f} ms\n".format(average_wait_times))
+	open_file.write("-- average turnaround time: {0:.3f} ms\n".format(average_turnaround_times))
+	open_file.write("-- total number of context switches: {}\n".format(total_context_switches + total_preemptions))
+	open_file.write("-- total number of preemptions: {}\n".format(total_preemptions))
 
 	open_file.close()
