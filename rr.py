@@ -418,7 +418,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 		average_wait_times += sum(total_wait_times[process])
 		number_wait_times += len(total_wait_times[process])
 
-	average_wait_times /= (number_wait_times - total_preemptions)
+	average_wait_times /= total_bursts_completed
 
 	# Average turnaround times calculations
 	average_turnaround_times = 0
@@ -427,7 +427,8 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 		average_turnaround_times += sum(total_turnaround_times[process])
 		average_turnaround_times += sum(total_wait_times[process])
 		number_turnaround_times += len(total_turnaround_times[process])
-	average_turnaround_times /= (number_turnaround_times - total_preemptions)
+		
+	average_turnaround_times /= total_bursts_completed
 
 	# Printing out the RR algorithm statistics
 	open_file.write("Algorithm RR\n")

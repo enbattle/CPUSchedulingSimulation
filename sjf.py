@@ -351,9 +351,8 @@ def sjf(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	number_wait_times = 0
 	for process in total_wait_times.keys():
 		average_wait_times += sum(total_wait_times[process])
-		number_wait_times += len(total_wait_times[process])
 
-	average_wait_times /= number_wait_times
+	average_wait_times /= total_bursts_completed
 
 	# Average turnaround times calculations
 	average_turnaround_times = 0
@@ -361,8 +360,8 @@ def sjf(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	for process in total_turnaround_times.keys():
 		average_turnaround_times += sum(total_turnaround_times[process])
 		average_turnaround_times += sum(total_wait_times[process])
-		number_turnaround_times += len(total_turnaround_times[process])
-	average_turnaround_times /= number_turnaround_times
+
+	average_turnaround_times /= total_bursts_completed
 
 	# Printing out the SJF algorithm statistics
 	open_file.write("Algorithm SJF\n")
