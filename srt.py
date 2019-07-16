@@ -577,6 +577,7 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 		average_turnaround_times += sum(total_turnaround_times[process])
 		average_turnaround_times += sum(total_wait_times[process])
 		number_turnaround_times += len(total_turnaround_times[process])
+		
 	average_turnaround_times /= number_turnaround_times
 
 	# Printing out the SRT algorithm statistics

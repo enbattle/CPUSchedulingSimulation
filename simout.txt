@@ -18,7 +18,7 @@ Algorithm SRT
 -- total number of preemptions: 174
 Algorithm RR
 -- average CPU burst time: 84.304 ms
--- average wait time: 584.216 ms
--- average turnaround time: 673.443 ms
--- total number of context switches: 661
--- total number of preemptions: 124
+-- average wait time: 646.331 ms
+-- average turnaround time: 735.626 ms
+-- total number of context switches: 670
+-- total number of preemptions: 133

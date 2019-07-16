@@ -230,11 +230,8 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 					total_turnaround_times[current_process] = temp_list
 					temporary_turnaround_times[sorted_processes_by_number[current_process]] = 0
 
-				# Check arugment to add process to end or beginning or queue
-				if queue_addition == "END":
-					queue.append(current_process)
-				else:
-					queue.insert(0, current_process)
+				# Add process to the queue again
+				queue.append(current_process)
 
 				# Set the wait time for the preempted process to be the time it was added back into the queue
 				temporary_wait_times[sorted_processes_by_number[current_process]] = time
@@ -427,7 +424,7 @@ def rr(some_processes, some_bursts, some_burst_times, some_io_times, context_swi
 		average_turnaround_times += sum(total_turnaround_times[process])
 		average_turnaround_times += sum(total_wait_times[process])
 		number_turnaround_times += len(total_turnaround_times[process])
-		
+
 	average_turnaround_times /= total_bursts_completed
 
 	# Printing out the RR algorithm statistics
