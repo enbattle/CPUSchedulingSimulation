@@ -548,12 +548,12 @@ def srt(some_processes, some_bursts, some_burst_times, some_io_times, context_sw
 	average_turnaround_times = 0
 	turnTimes = 0
 	for i in range(len(some_processes)):
-		totTime = process_termination_times[process_names[i]] - some_processes[i] - sum(some_io_times[i]) + 2
+		totTime = process_termination_times[process_names[i]] - some_processes[i] - sum(some_io_times[i]) + (context_switch_time//2)
 		turnTimes += totTime
 	average_turnaround_times = turnTimes/ sum(some_bursts)
 
 	#print(turnTimes, tot, total_context_switches+ total_preemptions)
-	totWait = turnTimes - tot - 4*(total_context_switches) - 4*(total_preemptions)
+	totWait = turnTimes - tot - (context_switch_time)*(total_context_switches) - (context_switch_time)*(total_preemptions)
 	average_wait_times = totWait/sum(some_bursts)
 
 	# Printing out the SRT algorithm statistics
