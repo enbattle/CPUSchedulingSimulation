@@ -59,7 +59,7 @@ def check_CPU_burst(time, current_process, queue, sorted_processes_by_number, bu
 
 		# recalculate tau
 		actual_burst = burst_times[sorted_processes_by_number[current_process]].pop(0)
-		tau_dict[current_process] = math.ceil((tau_dict[current_process] * alpha_value) + (actual_burst * alpha_value))
+		tau_dict[current_process] = math.ceil((tau_dict[current_process] * (1-alpha_value)) + (actual_burst * alpha_value))
 		
 		if time <= 999:
 			print("time {}ms: Recalculated tau = {}ms for process {} [Q {}]"
